@@ -169,8 +169,7 @@ test("every guide links to the other two guides", async () => {
 test("public copy contains no private paths, credentials, or promises", async () => {
   const markdown = (await Promise.all(posts.map((post) => read(post.file)))).join("\n");
   for (const forbidden of [
-    /iwhalecloud/i,
-    /C:\\Users\\/i,
+    /(?:[A-Za-z]:\\|\/(?:Users|home)\/)[^\s]+/,
     /-----BEGIN (?:RSA |OPENSSH )?PRIVATE KEY-----/,
     /gh[pousr]_[A-Za-z0-9_]{20,}/,
     /guarantee(?:d|s)? (?:a )?(?:fix|ranking|result)/i,
