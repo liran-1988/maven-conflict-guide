@@ -98,3 +98,24 @@ test("dependency tree guide meets its release contract", async () => {
     ],
   });
 });
+
+test("omitted-for-conflict guide meets its release contract", async () => {
+  const markdown = await read("docs/_posts/2026-07-12-maven-omitted-for-conflict.md");
+  assertGuide(markdown, {
+    title: 'What "Omitted for Conflict" Means in Maven',
+    permalink: "/maven-omitted-for-conflict/",
+    headings: [
+      "Quick Answer",
+      "Why Maven Omits One Version",
+      "Worked Example",
+      "How to Find the Winning Path",
+      "When to Change the Result",
+      "Related Guides",
+      "Sources",
+    ],
+    sources: [
+      "https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html",
+      "https://maven.apache.org/plugins/maven-dependency-plugin/tree-mojo.html",
+    ],
+  });
+});
