@@ -79,12 +79,14 @@ test("home page and README describe the same narrow site", async () => {
 });
 
 test("AdSense loader and privacy page are present", async () => {
-  const head = await read("docs/_includes/custom-head.html");
+  const head = await read("docs/_includes/head.html");
   assert.match(
     head,
     /https:\/\/pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js\?client=ca-pub-1349340832655411/,
   );
   assert.match(head, /crossorigin="anonymous"/);
+  assert.match(head, /\{%- seo -%\}/);
+  assert.match(head, /\{%- feed_meta -%\}/);
 
   const privacy = await read("docs/privacy.md");
   const metadata = frontMatter(privacy);
