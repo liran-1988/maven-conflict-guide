@@ -119,3 +119,25 @@ test("omitted-for-conflict guide meets its release contract", async () => {
     ],
   });
 });
+
+test("convergence guide meets its release contract", async () => {
+  const markdown = await read("docs/_posts/2026-07-12-fix-dependency-convergence.md");
+  assertGuide(markdown, {
+    title: "How to Fix Maven Dependency Convergence Errors",
+    permalink: "/fix-dependency-convergence/",
+    headings: [
+      "Quick Answer",
+      "Read the Convergence Error",
+      "Choose a Version Deliberately",
+      "Use an Exclusion Only When It Is Narrow",
+      "Verify the Result",
+      "Related Guides",
+      "Sources",
+    ],
+    sources: [
+      "https://maven.apache.org/enforcer/enforcer-rules/dependencyConvergence.html",
+      "https://maven.apache.org/guides/introduction/introduction-to-optional-and-excludes-dependencies.html",
+      "https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html",
+    ],
+  });
+});
