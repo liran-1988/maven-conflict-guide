@@ -141,3 +141,56 @@ test("convergence guide meets its release contract", async () => {
     ],
   });
 });
+
+const posts = [
+  {
+    file: "docs/_posts/2026-07-12-read-maven-dependency-tree.md",
+    permalink: "/read-maven-dependency-tree/",
+  },
+  {
+    file: "docs/_posts/2026-07-12-maven-omitted-for-conflict.md",
+    permalink: "/maven-omitted-for-conflict/",
+  },
+  {
+    file: "docs/_posts/2026-07-12-fix-dependency-convergence.md",
+    permalink: "/fix-dependency-convergence/",
+  },
+];
+
+test("every guide links to the other two guides", async () => {
+  for (const current of posts) {
+    const markdown = await read(current.file);
+    for (const related of posts.filter((post) => post.file !== current.file)) {
+      assert.ok(markdown.includes(related.permalink), `${current.file} must link to ${related.permalink}`);
+    }
+  }
+});
+
+test("public copy contains no private paths, credentials, or promises", async () => {
+  const markdown = (await Promise.all(posts.map((post) => read(post.file)))).join("\n");
+  for (const forbidden of [
+    /iwhalecloud/i,
+    /C:\\Users\\/i,
+    /-----BEGIN (?:RSA |OPENSSH )?PRIVATE KEY-----/,
+    /gh[pousr]_[A-Za-z0-9_]{20,}/,
+    /guarantee(?:d|s)? (?:a )?(?:fix|ranking|result)/i,
+  ]) {
+    assert.doesNotMatch(markdown, forbidden);
+  }
+});
+
+test("guide metadata is unique and bash examples contain Maven commands", async () => {
+  const markdownFiles = await Promise.all(posts.map((post) => read(post.file)));
+  const metadata = markdownFiles.map(frontMatter);
+  assert.equal(new Set(metadata.map((item) => item.title)).size, posts.length);
+  assert.equal(new Set(metadata.map((item) => item.description)).size, posts.length);
+  for (const markdown of markdownFiles) {
+    const bashBlocks = [...markdown.matchAll(/```bash\r?\n([\s\S]*?)```/g)];
+    assert.ok(bashBlocks.length > 0, "Each guide needs at least one bash example");
+    for (const block of bashBlocks) {
+      for (const line of block[1].split(/\r?\n/).filter(Boolean)) {
+        assert.match(line, /^mvn\b/);
+      }
+    }
+  }
+});
