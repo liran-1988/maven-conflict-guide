@@ -78,6 +78,22 @@ test("home page and README describe the same narrow site", async () => {
   assert.match(readme, /three focused guides/i);
 });
 
+test("AdSense loader and privacy page are present", async () => {
+  const head = await read("docs/_includes/custom-head.html");
+  assert.match(
+    head,
+    /https:\/\/pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js\?client=ca-pub-1349340832655411/,
+  );
+  assert.match(head, /crossorigin="anonymous"/);
+
+  const privacy = await read("docs/privacy.md");
+  const metadata = frontMatter(privacy);
+  assert.equal(metadata.permalink, "/privacy/");
+  assert.match(privacy, /Google AdSense/);
+  assert.match(privacy, /cookies/i);
+  assert.match(privacy, /Google Privacy & Terms/);
+});
+
 test("dependency tree guide meets its release contract", async () => {
   const markdown = await read("docs/_posts/2026-07-12-read-maven-dependency-tree.md");
   assertGuide(markdown, {
