@@ -1,0 +1,11 @@
+title: Maven Conflict Guide
+description: Practical explanations for understanding and fixing Maven dependency conflicts
+theme: minima
+markdown: kramdown
+url: "https://liran-1988.github.io"
+baseurl: "/maven-conflict-guide"
+permalink: pretty
+plugins:
+  - jekyll-sitemap
+exclude:
+  - superpowers
