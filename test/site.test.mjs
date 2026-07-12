@@ -28,6 +28,34 @@ function frontMatter(markdown) {
   );
 }
 
+function body(markdown) {
+  return markdown.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, "");
+}
+
+function proseWordCount(markdown) {
+  return body(markdown)
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/`[^`]+`/g, " ")
+    .replace(/\[[^\]]+\]\([^\)]+\)/g, " ")
+    .match(/[A-Za-z0-9][A-Za-z0-9'/-]*/g)?.length ?? 0;
+}
+
+function assertGuide(markdown, expected) {
+  const metadata = frontMatter(markdown);
+  assert.equal(metadata.layout, "post");
+  assert.equal(metadata.title, expected.title);
+  assert.equal(metadata.permalink, expected.permalink);
+  assert.ok(metadata.description.length >= 70 && metadata.description.length <= 160);
+  const count = proseWordCount(markdown);
+  assert.ok(count >= 800 && count <= 1500, `Expected 800-1500 prose words, got ${count}`);
+  for (const heading of expected.headings) {
+    assert.match(markdown, new RegExp(`^## ${heading}$`, "m"));
+  }
+  for (const source of expected.sources) {
+    assert.ok(markdown.includes(source), `Missing primary source: ${source}`);
+  }
+}
+
 test("Jekyll config pins the owned Pages URL and excludes internal specs", async () => {
   const config = await read("docs/_config.yml");
   assert.match(config, /^title: Maven Conflict Guide$/m);
@@ -48,4 +76,25 @@ test("home page and README describe the same narrow site", async () => {
   const readme = await read("README.md");
   assert.match(readme, /https:\/\/liran-1988\.github\.io\/maven-conflict-guide\//);
   assert.match(readme, /three focused guides/i);
+});
+
+test("dependency tree guide meets its release contract", async () => {
+  const markdown = await read("docs/_posts/2026-07-12-read-maven-dependency-tree.md");
+  assertGuide(markdown, {
+    title: "How to Read Maven Dependency Tree Output",
+    permalink: "/read-maven-dependency-tree/",
+    headings: [
+      "Quick Answer",
+      "Example Dependency Tree",
+      "How to Read Each Line",
+      "Common Conflict Markers",
+      "What to Do Next",
+      "Related Guides",
+      "Sources",
+    ],
+    sources: [
+      "https://maven.apache.org/plugins/maven-dependency-plugin/tree-mojo.html",
+      "https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html",
+    ],
+  });
 });
